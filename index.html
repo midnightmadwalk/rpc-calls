@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum RPC Call</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea, input, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eef;
+            border: 1px solid #ccc;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>RPC Call Frontend</h1>
+    
+    <!-- New Box for Changing RPC URL -->
+    <label for="rpcUrl">RPC URL:</label>
+    <input id="rpcUrl" type="text" placeholder="Enter custom RPC URL here..." value="https://rpc.pulsechain.com">
+
+    <label for="contract">Paste Contract Address:</label>
+    <textarea id="contract" placeholder="Enter contract address here..." rows="3"></textarea>
+
+    <label for="method">Method:</label>
+    <input id="method" type="text" placeholder="Enter method name (e.g., balanceOf)">
+
+    <label for="data">Data:</label>
+    <textarea id="data" placeholder="Enter data payload (e.g., encoded ABI)" rows="3"></textarea>
+
+    <button id="sendRequest">RPC CALLS</button>
+
+    <div class="response" id="responseBox">
+        <strong>Response:</strong>
+        <p id="response"></p>
+    </div>
+
+    <script>
+        document.getElementById('sendRequest').addEventListener('click', async () => {
+            const contractAddress = document.getElementById('contract').value.trim();
+            const method = document.getElementById('method').value.trim();
+            const data = document.getElementById('data').value.trim();
+            const rpcUrl = document.getElementById('rpcUrl').value.trim() || "https://rpc.pulsechain.com"; // Default to PulseChain if empty
+
+            const params = {
+                to: contractAddress,
+                data: method + data
+            };
+    
+            const payload = {
+                jsonrpc: "2.0",
+                id: 1,
+                method: "eth_call",
+                params: [params, "latest"]
+            };
+    
+            try {
+                const response = await fetch(rpcUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const result = await response.json();
+                document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('response').innerText = `Error: ${error.message}`;
+            }
+        });
+    </script>
+    
+</body>
+</html>
