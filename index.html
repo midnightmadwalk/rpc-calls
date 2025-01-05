@@ -41,7 +41,7 @@
 <body>
     <h1>RPC Call Frontend</h1>
     
-    <!-- New Box for Changing RPC URL -->
+    <!-- Box for Changing RPC URL -->
     <label for="rpcUrl">RPC URL:</label>
     <input id="rpcUrl" type="text" placeholder="Enter custom RPC URL here..." value="https://rpc.pulsechain.com">
 
@@ -56,12 +56,24 @@
 
     <button id="sendRequest">RPC CALLS</button>
 
+    <!-- New Section for Generating 32-Byte Encoded Address -->
+    <label for="address">Generate 32-Byte Padded Address:</label>
+    <input id="address" type="text" placeholder="Enter Ethereum address here...">
+    <button id="generateAddress">Generate 32-Byte Address</button>
+    
     <div class="response" id="responseBox">
         <strong>Response:</strong>
         <p id="response"></p>
     </div>
 
+    <!-- Output for Padded Address -->
+    <div class="response" id="addressResponseBox" style="display: none;">
+        <strong>32-Byte Padded Address:</strong>
+        <p id="addressResponse"></p>
+    </div>
+
     <script>
+        // Function to handle RPC Calls
         document.getElementById('sendRequest').addEventListener('click', async () => {
             const contractAddress = document.getElementById('contract').value.trim();
             const method = document.getElementById('method').value.trim();
@@ -99,7 +111,22 @@
                 document.getElementById('response').innerText = `Error: ${error.message}`;
             }
         });
+
+        // Function to generate 32-byte padded address
+        document.getElementById('generateAddress').addEventListener('click', () => {
+            const address = document.getElementById('address').value.trim();
+            if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+                alert("Invalid Ethereum address. Please enter a valid 40-character address.");
+                return;
+            }
+            // Remove '0x' prefix and pad the address
+            const paddedAddress = address.slice(2).padStart(64, '0');
+            const fullPaddedAddress = "0x" + paddedAddress;
+
+            // Display the padded address
+            document.getElementById('addressResponseBox').style.display = "block";
+            document.getElementById('addressResponse').innerText = fullPaddedAddress;
+        });
     </script>
-    
 </body>
 </html>
